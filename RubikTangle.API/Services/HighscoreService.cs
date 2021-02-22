@@ -19,6 +19,7 @@ namespace RubikTangle.API.Services
 
         public async Task<List<Highscore>> GetAll()
         {
+            //Appconfig infos should be handled by a secret manager in production
             CosmosClient client = new CosmosClient(config.GetValue<string>("CosmosDb:Endpoint"), config.GetValue<string>("CosmosDb:PrimaryKey"));
             var container = client.GetDatabase(config.GetValue<string>("CosmosDb:Database")).GetContainer(config.GetValue<string>("CosmosDb:Container"));
 
@@ -37,13 +38,12 @@ namespace RubikTangle.API.Services
                 }
             }
 
-            throw new Exception();
-
             return highscores;
         }
 
         public async Task<Highscore> Save(Highscore highscore)
         {
+            //Appconfig infos should be handled by a secret manager in production
             CosmosClient client = new CosmosClient(config.GetValue<string>("CosmosDb:Endpoint"), config.GetValue<string>("CosmosDb:PrimaryKey"));
             var container = client.GetDatabase(config.GetValue<string>("CosmosDb:Database")).GetContainer(config.GetValue<string>("CosmosDb:Container"));
 
