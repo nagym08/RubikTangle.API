@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Configuration;
 using RubikTangle.API.Models;
 using System;
 using System.Collections.Generic;
@@ -9,13 +10,17 @@ namespace RubikTangle.API.Services
 {
     public class HighscoreService : IHighscoreService
     {
+        private readonly IConfiguration config;
+
+        public HighscoreService(IConfiguration config)
+        {
+            this.config = config;
+        }
+
         public async Task<List<Highscore>> GetAll()
         {
-            string endpointUrl = "https://miklos-nagy.documents.azure.com:443/";
-            string primaryKey = "Ri7pQaf1BdsyS6LsM14pEUJlmVgz2QCDj8KPFKh20yaRXT60BQfel9P2Dg5QnuVVC9EgdZyNZQfGZHxPHPw4bg==";
-
-            CosmosClient client = new CosmosClient(endpointUrl, primaryKey);
-            var container = client.GetDatabase("NeuroDiab").GetContainer("Highscores");
+            CosmosClient client = new CosmosClient(config.GetValue<string>("CosmosDb:Endpoint"), config.GetValue<string>("CosmosDb:PrimaryKey"));
+            var container = client.GetDatabase(config.GetValue<string>("CosmosDb:Database")).GetContainer(config.GetValue<string>("CosmosDb:Container"));
 
             var sqlQueryText = "SELECT * FROM c";
             QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
@@ -32,16 +37,15 @@ namespace RubikTangle.API.Services
                 }
             }
 
+            throw new Exception();
+
             return highscores;
         }
 
         public async Task<Highscore> Save(Highscore highscore)
         {
-            string endpointUrl = "https://miklos-nagy.documents.azure.com:443/";
-            string primaryKey = "Ri7pQaf1BdsyS6LsM14pEUJlmVgz2QCDj8KPFKh20yaRXT60BQfel9P2Dg5QnuVVC9EgdZyNZQfGZHxPHPw4bg==";
-
-            CosmosClient client = new CosmosClient(endpointUrl, primaryKey);
-            var container = client.GetDatabase("NeuroDiab").GetContainer("Highscores");
+            CosmosClient client = new CosmosClient(config.GetValue<string>("CosmosDb:Endpoint"), config.GetValue<string>("CosmosDb:PrimaryKey"));
+            var container = client.GetDatabase(config.GetValue<string>("CosmosDb:Database")).GetContainer(config.GetValue<string>("CosmosDb:Container"));
 
             highscore.Id = Guid.NewGuid();
             var createdItem = await container.CreateItemAsync(highscore);
