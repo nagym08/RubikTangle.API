@@ -23,7 +23,7 @@ namespace RubikTangle.API.Services
             CosmosClient client = new CosmosClient(config.GetValue<string>("CosmosDb:Endpoint"), config.GetValue<string>("CosmosDb:PrimaryKey"));
             var container = client.GetDatabase(config.GetValue<string>("CosmosDb:Database")).GetContainer(config.GetValue<string>("CosmosDb:Container"));
 
-            var sqlQueryText = "SELECT * FROM c";
+            var sqlQueryText = "SELECT * FROM c ORDER BY c.Steps";
             QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
             FeedIterator<Highscore> queryResultSetIterator = container.GetItemQueryIterator<Highscore>(queryDefinition);
 
